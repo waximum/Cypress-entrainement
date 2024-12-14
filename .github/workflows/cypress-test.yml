@@ -1,25 +1,30 @@
 name: Run Cypress Tests
 
+# Déclencheurs : Exécuter le workflow lorsque certains événements se produisent
 on:
-  push:
+  push:                   # Exécute le workflow lorsqu'un push est fait
     branches:
-      - main
-  pull_request:
+      - main              # Spécifiquement sur la branche 'main'
+  pull_request:           # Exécute aussi le workflow sur les pull requests
     branches:
-      - main
+      - main              # Concernant les PR ciblant la branche 'main'
 
+# Définition des jobs
 jobs:
-  cypress-tests:
-    runs-on: ubuntu-latest
+  cypress-tests:          # Nom du job
+    runs-on: ubuntu-latest  # Le job s'exécute sur un environnement Ubuntu
 
-    steps:
+    steps:                # Les étapes de ce job
+    # Étape 1 : Cloner le dépôt
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3  # Action GitHub officielle pour cloner le repo
 
+    # Étape 2 : Exécuter Cypress à l'intérieur d'un conteneur Docker
     - name: Run Cypress in Docker
-      run: |
-        docker run --rm \
-          -v ${{ github.workspace }}:/e2e \
-          -w /e2e \
-          --shm-size=2g \
-          cypress/included:13.16.1 npx cypress run
+      run: |              # Multi-ligne pour exécuter des commandes shell
+        docker run --rm \                       # Nettoie le conteneur après exécution
+          -v ${{ github.workspace }}:/e2e \    # Monte le dossier GitHub dans le conteneur
+          -w /e2e \                            # Définit le répertoire de travail à /e2e
+          --shm-size=2g \                      # Définit une mémoire partagée pour éviter les crashs de navigateur
+          cypress/included:13.16.1 \           # Image Docker officielle de Cypress avec la version 13.16.1
+          npx cypress run                      # Commande pour exécuter les tests Cypress
